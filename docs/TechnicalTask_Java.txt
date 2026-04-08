@@ -1,0 +1,144 @@
+Необходимо разработать RESTful API приложение для работы с отелями со следующими методами:
+1)	
+	GET /hotels - получение списка всех отелей с их краткой информацией
+	Пример ответа:
+		[
+			{
+				"id": 1,
+				"name": "DoubleTree by Hilton Minsk",
+				"description": "The DoubleTree by Hilton Hotel Minsk offers 193 luxurious rooms in the Belorussian capital and stunning views of Minsk city from the hotel's 20th floor ..."
+				"address": "9 Pobediteley Avenue, Minsk, 220004, Belarus",
+				"phone": "+375 17 309-80-00"
+			}
+		]
+2)	
+	GET /hotels/{id} - получение расширенной информации по конктретному отелю
+	Пример ответа:
+		{
+			"id": 1,
+			"name": "DoubleTree by Hilton Minsk",
+            "description": "The DoubleTree by Hilton Hotel Minsk offers 193 luxurious rooms in the Belorussian capital and stunning views of Minsk city from the hotel's 20th floor ..."
+			"brand": "Hilton",
+			"address": 
+				{
+					"houseNumber": 9
+					"street": "Pobediteley Avenue",
+					"city": "Minsk",
+					"country": "Belarus",
+					"postCode": "220004"
+				}
+			"contacts": 
+				{
+					"phone": "+375 17 309-80-00",
+					"email": "doubletreeminsk.info@hilton.com"
+				},
+			"arrivalTime:
+				{
+					"checkIn": "14:00",
+					"checkOut": "12:00"
+				},
+			"amenities": 
+				[
+					"Free parking",
+					"Free WiFi",
+					"Non-smoking rooms",
+					"Concierge",
+					"On-site restaurant",
+					"Fitness center",
+					"Pet-friendly rooms",
+					"Room service",
+					"Business center",
+					"Meeting rooms"
+				]
+		}
+3)
+	GET /search - поиск получение списка всех отелей с их краткой информацией по следующим параметрам: name, brand, city, country, amenities. Например: /search?city=minsk
+	Пример ответа:
+		см. GET /hotels
+4)
+	POST /hotels - создание нового отеля
+	Пример запроса:
+		{
+			"name": "DoubleTree by Hilton Minsk",
+			"description": "The DoubleTree by Hilton Hotel Minsk offers 193 luxurious rooms in the Belorussian capital and stunning views of Minsk city from the hotel's 20th floor ...", - (optional)
+			"brand" "Hilton",
+			"address": 
+				{
+					"houseNumber": 9
+					"street": "Pobediteley Avenue",
+					"city": "Minsk",
+					"country": "Belarus",
+					"postCode": "220004"
+				}
+			"contacts": 
+				{
+					"phone": "+375 17 309-80-00",
+					"email": "doubletreeminsk.info@hilton.com"
+				},
+			"arrivalTime:
+				{
+					"checkIn": "14:00",
+					"checkOut": "12:00" - (optional)
+				}
+		}
+	Пример ответа:
+		{
+			"id": 1,
+			"name": "DoubleTree by Hilton Minsk",
+			"description": "The DoubleTree by Hilton Hotel Minsk offers 193 luxurious rooms in the Belorussian capital and stunning views of Minsk city from the hotel's 20th floor ...",
+			"address": "9 Pobediteley Avenue, Minsk, 220004, Belarus",
+			"phone": "+375 17 309-80-00"
+		}
+5)
+	POST /hotels/{id}/amenities - добавление списка amenities к отелю
+	Пример запроса:
+		[
+			"Free parking",
+			"Free WiFi",
+			"Non-smoking rooms",
+			"Concierge",
+			"On-site restaurant",
+			"Fitness center",
+			"Pet-friendly rooms",
+			"Room service",
+			"Business center",
+			"Meeting rooms"
+		]
+6)		
+	GET /histogram/{param} - получение колличества отелей сгруппированных по каждому значению указанного параметра. Параметр: brand, city, country, amenities.
+	Например: /histogram/city должен вернуть:
+		{
+			"Minsk": 1,
+			"Moskow: 2,
+			"Mogilev: 1,
+			и тд.
+		}
+	а /histogram/amenities должен вернуть:
+		{
+			"Free parking": 1,
+			"Free WiFi: 20,
+			"Non-smoking rooms": 5,
+			"Fitness center": 1,
+			и тд.
+		}
+
+Приложение должно запускаться из консоли при помощи команды mvn spring-boot:run
+Порт для запуска: 8092
+У всех методов должен быть общий префикс "property-view". Например: GET /property-view/hotels, GET /property-view/search
+
+Используемые технологии:
+	Maven, Java 17+, Spring Boot, Spring JPA, Liquibase
+В качестве базы данных:
+	H2
+	
+Не обязательно, но будет преимуществом, наличие:
+	Тестов
+	Документации Swagger
+	Использование паттернов проектирования
+	Разделения на слои
+	Возможности "быстро" переключиться с H2 на другую базу (MySQL, PostgreSQL, Mongo и т.д).
+
+Результат высылайте в виде ссылки на GitHub.
+
+ВАЖНО! Выполнить задание на 21 версии Java. Соответсвие приложения требованиям будет проверяться в автоматизированной среде.
+
