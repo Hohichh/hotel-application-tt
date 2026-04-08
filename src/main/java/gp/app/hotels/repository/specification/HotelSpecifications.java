@@ -1,4 +1,4 @@
-package gp.app.hotels.repository;
+package gp.app.hotels.repository.specification;
 
 import gp.app.hotels.model.Amenity;
 import gp.app.hotels.model.Hotel;

@@ -13,6 +13,8 @@ import java.util.UUID;
 
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, UUID>, JpaSpecificationExecutor<Hotel> {
+    // Получить все отели в виде краткой проекции для GET /hotels
+    List<HotelShort> findAllBy();
 
     // Для GET /hotels/{id} извлекаем Hotel с инициализированными amenities
     @EntityGraph(attributePaths = {"amenities"})
