@@ -42,7 +42,7 @@
             <column name="check_in" type="TIME">
                 <constraints nullable="false"/>
             </column>
-            <column name="check_out" type="TIME">
+            <column name="check_out" type="TIME"/>
         </createTable>
 
         <!-- Индексы для таблицы hotel согласно Entity_relationship_design.md -->

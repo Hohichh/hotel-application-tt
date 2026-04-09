@@ -13,7 +13,8 @@ public class HotelSpecifications {
             if (!StringUtils.hasText(name)) {
                 return null;
             }
-            return cb.equal(root.get("name"), name);
+            String normalizedName = name.trim().toLowerCase();
+            return cb.like(cb.lower(root.get("name")), "%" + normalizedName + "%");
         };
     }
 
@@ -22,7 +23,7 @@ public class HotelSpecifications {
             if (!StringUtils.hasText(brand)) {
                 return null;
             }
-            return cb.equal(root.get("brand"), brand);
+            return cb.equal(cb.lower(root.get("brand")), brand.trim().toLowerCase());
         };
     }
 
@@ -31,7 +32,7 @@ public class HotelSpecifications {
             if (!StringUtils.hasText(city)) {
                 return null;
             }
-            return cb.equal(root.get("address").get("city"), city);
+            return cb.equal(cb.lower(root.get("address").get("city")), city.trim().toLowerCase());
         };
     }
 
@@ -40,7 +41,7 @@ public class HotelSpecifications {
             if (!StringUtils.hasText(country)) {
                 return null;
             }
-            return cb.equal(root.get("address").get("country"), country);
+            return cb.equal(cb.lower(root.get("address").get("country")), country.trim().toLowerCase());
         };
     }
 

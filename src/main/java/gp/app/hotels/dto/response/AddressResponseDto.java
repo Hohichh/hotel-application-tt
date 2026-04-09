@@ -1,7 +1,7 @@
 package gp.app.hotels.dto.response;
 
 public record AddressResponseDto(
-    Integer houseNumber,
+    String houseNumber,
     String street,
     String city,
     String country,

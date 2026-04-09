@@ -7,7 +7,7 @@ import jakarta.persistence.Embeddable;
 public class Address {
 
     @Column(name = "house_number", nullable = false)
-    private Integer houseNumber;
+    private String houseNumber;
 
     @Column(name = "street", nullable = false)
     private String street;
@@ -24,7 +24,7 @@ public class Address {
     public Address() {
     }
 
-    public Address(Integer houseNumber, String street, String city, String country, String postCode) {
+    public Address(String houseNumber, String street, String city, String country, String postCode) {
         this.houseNumber = houseNumber;
         this.street = street;
         this.city = city;
@@ -32,11 +32,11 @@ public class Address {
         this.postCode = postCode;
     }
 
-    public Integer getHouseNumber() {
+    public String getHouseNumber() {
         return houseNumber;
     }
 
-    public void setHouseNumber(Integer houseNumber) {
+    public void setHouseNumber(String houseNumber) {
         this.houseNumber = houseNumber;
     }
 

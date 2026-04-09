@@ -12,12 +12,17 @@ import gp.app.hotels.repository.HotelRepository;
 import gp.app.hotels.repository.HotelShort;
 import gp.app.hotels.repository.specification.HotelSpecificationBuilder;
 import gp.app.hotels.repository.specification.HotelSpecifications;
-import jakarta.persistence.EntityNotFoundException;
+import gp.app.hotels.exception.HotelNotFoundException;
+import gp.app.hotels.exception.InvalidParameterException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +62,7 @@ public class HotelServiceImpl implements HotelService {
     @Transactional(readOnly = true)
     public HotelFullResponseDto getHotelById(UUID id) {
         Hotel hotel = hotelRepository.findWithAmenitiesById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Hotel not found with id: " + id));
+                .orElseThrow(() -> new HotelNotFoundException(id));
         return hotelMapper.toFullDto(hotel);
     }
 
@@ -92,27 +97,41 @@ public class HotelServiceImpl implements HotelService {
     @Transactional
     public void addAmenitiesToHotel(UUID hotelId, List<String> newAmenitiesList) {
         Hotel hotel = hotelRepository.findWithAmenitiesById(hotelId)
-                .orElseThrow(() -> new EntityNotFoundException("Hotel not found with id: " + hotelId));
+                .orElseThrow(() -> new HotelNotFoundException(hotelId));
 
         if (newAmenitiesList != null && !newAmenitiesList.isEmpty()) {
-            // Находим уже существующие в базе удобства из переданного списка
-            Set<Amenity> existingAmenities = amenityRepository.findAllByNameIn(newAmenitiesList);
+            Set<String> normalizedNames = newAmenitiesList.stream()
+                    .filter(StringUtils::hasText)
+                    .map(String::trim)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+
+            if (normalizedNames.isEmpty()) {
+                return;
+            }
+
+            List<String> normalizedNamesList = new ArrayList<>(normalizedNames);
+            Set<Amenity> existingAmenities = amenityRepository.findAllByNameIn(normalizedNamesList);
             Set<String> existingNames = existingAmenities.stream()
                     .map(Amenity::getName)
                     .collect(Collectors.toSet());
 
             Set<Amenity> toAdd = new HashSet<>(existingAmenities);
+            List<String> missingNames = normalizedNamesList.stream()
+                    .filter(name -> !existingNames.contains(name))
+                    .collect(Collectors.toList());
 
-            // Те, которых нет в базе, мы создаём
-            for (String name : newAmenitiesList) {
-                if (!existingNames.contains(name)) {
-                    Amenity newAmenity = new Amenity(name);
-                    amenityRepository.save(newAmenity);
-                    toAdd.add(newAmenity);
+            if (!missingNames.isEmpty()) {
+                List<Amenity> newAmenities = missingNames.stream()
+                        .map(Amenity::new)
+                        .collect(Collectors.toList());
+
+                try {
+                    toAdd.addAll(amenityRepository.saveAll(newAmenities));
+                } catch (DataIntegrityViolationException ex) {
+                    toAdd.addAll(amenityRepository.findAllByNameIn(missingNames));
                 }
             }
 
-            // Добавляем отсутствовавшие у отеля удобства
             hotel.getAmenities().addAll(toAdd);
             hotelRepository.save(hotel);
         }
@@ -124,7 +143,7 @@ public class HotelServiceImpl implements HotelService {
         Supplier<List<HistogramResult>> provider = histogramProviders.get(param.toLowerCase());
         
         if (provider == null) {
-            throw new IllegalArgumentException("Unsupported histogram parameter: " + param);
+            throw new InvalidParameterException(param, "Unsupported histogram parameter: " + param);
         }
 
         List<HistogramResult> results = provider.get();
@@ -134,7 +153,11 @@ public class HotelServiceImpl implements HotelService {
                 .collect(Collectors.toMap(
                         HistogramResult::getGroupName,
                         HistogramResult::getCount,
-                        Long::sum // Если вдруг ключи задублируются, суммируем
+                        (left, right) -> {
+                            long leftValue = left == null ? 0L : left;
+                            long rightValue = right == null ? 0L : right;
+                            return leftValue + rightValue;
+                        } // Если вдруг ключи задублируются, суммируем
                 ));
     }
 }
