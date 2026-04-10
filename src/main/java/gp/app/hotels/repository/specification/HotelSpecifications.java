@@ -50,7 +50,7 @@ public class HotelSpecifications {
             if (!StringUtils.hasText(amenityName)) {
                 return null;
             }
-            query.distinct(true); // важный момент, избежать дублирования
+            query.distinct(true);
             Join<Hotel, Amenity> amenitiesJoin = root.join("amenities");
             return cb.equal(amenitiesJoin.get("name"), amenityName);
         };

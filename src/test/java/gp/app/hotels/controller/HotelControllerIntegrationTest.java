@@ -39,10 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * End-to-end интеграционный тест API отелей.
- * Поднимает полный Spring-контекст с H2 in-memory базой.
- * Схема создаётся через Liquibase из основного changelog.
- * Каждый тест работает в транзакции, которая откатывается после — БД изолирована.
+ * End-to-end integration test for hotels api
+ * botts up full Spring-context with H2 in-memory db.
+ * Schema is created via Liquibase from main changelog.
+ * Each test works in transaction, which is rolled back after — db is isolated.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -63,7 +63,7 @@ class HotelControllerIntegrationTest {
     private MockMvc mockMvc;
 
     // ─────────────────────────────────────────────────────────────
-    // Pre-condition: данные в базе перед каждым тестом
+    // Pre-condition: data in db before each test
     // ─────────────────────────────────────────────────────────────
 
     private UUID grandPalaceId;
@@ -86,7 +86,7 @@ class HotelControllerIntegrationTest {
         grandPalace.setAmenities(new HashSet<>(Set.of(wifi, pool)));
         grandPalaceId = hotelRepository.save(grandPalace).getId();
 
-        // Hotel 2 — Star Inn (Manchester, StarBrand) — с amenity Parking
+        // Hotel 2 — Star Inn (Manchester, StarBrand) — with amenity Parking
         Hotel starInn = new Hotel();
         starInn.setName("Star Inn");
         starInn.setDescription("Budget hotel near station");

@@ -10,7 +10,6 @@ public interface HotelShort {
     
     String getDescription();
     
-    // SpEL-выражение для сборки адреса в одну строку
     @Value("#{target.address.houseNumber + ' ' + target.address.street + ', ' + target.address.city + ', ' + target.address.postCode + ', ' + target.address.country}")
     String getAddress();
     

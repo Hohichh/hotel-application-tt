@@ -56,6 +56,9 @@ All endpoints are exposed under `property-view` prefix directly in controller ma
 ## Swagger UI
 
 - OpenAPI docs are available via Springdoc UI after app start.
+```
+http://localhost:8092/swagger-ui/index.html
+```
 
 ## Requirement compliance (summary)
 

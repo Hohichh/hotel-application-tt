@@ -12,8 +12,7 @@ import java.util.UUID;
 @Repository
 public interface AmenityRepository extends JpaRepository<Amenity, UUID> {
     
-    // Найти все существующие удобства по списку имен
     Set<Amenity> findAllByNameIn(List<String> names);
-    
+
     Optional<Amenity> findByName(String name);
 }

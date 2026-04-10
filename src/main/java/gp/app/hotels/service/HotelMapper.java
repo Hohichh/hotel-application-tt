@@ -19,32 +19,28 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface HotelMapper {
 
-    // 1. Проекция (из базы напрямую) -> Short DTO
-    // Тут не нужны правила, имена полей (id, name, description, address, phone) совпадают 1в1
+    // 1. Projection (HotelShort) -> Short DTO
     HotelShortResponseDto toShortDtoFromProjection(HotelShort projection);
 
-    // 2. Полная Entity -> Short DTO (используется при ответе POST /hotels)
+    // 2. Entity -> Short DTO 
     @Mapping(target = "address", source = ".", qualifiedByName = "formatAddress")
     @Mapping(target = "phone", source = "contacts.phone")
     HotelShortResponseDto toShortDto(Hotel hotel);
 
     // 3. Entity -> Full DTO (для GET /hotels/{id})
-    // address/contacts замапятся сами (имеют одинаковую структуру), 
-    // amneities превращаем в List<String>, DateTimes форматируем в String
     @Mapping(target = "amenities", source = "amenities", qualifiedByName = "mapAmenitiesToStrings")
     @Mapping(target = "arrivalTime.checkIn", source = "arrivalTime.checkIn", qualifiedByName = "formatTime")
     @Mapping(target = "arrivalTime.checkOut", source = "arrivalTime.checkOut", qualifiedByName = "formatTime")
     HotelFullResponseDto toFullDto(Hotel hotel);
 
-    // 4. CreateRequest DTO -> Entity (для сохранения при POST /hotels)
+    // 4. CreateRequest DTO -> Entity 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "amenities", ignore = true)
     @Mapping(target = "arrivalTime.checkIn", source = "arrivalTime.checkIn", qualifiedByName = "parseTime")
     @Mapping(target = "arrivalTime.checkOut", source = "arrivalTime.checkOut", qualifiedByName = "parseTime")
     Hotel toEntity(HotelCreateRequestDto request);
 
-    // Вспомогательные методы (преобразователи типов)
-
+    
     @Named("formatAddress")
     default String formatAddress(Hotel hotel) {
         if (hotel == null || hotel.getAddress() == null) return null;

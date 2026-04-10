@@ -77,7 +77,6 @@ public class HotelServiceImpl implements HotelService {
                 .withStringList(params.amenities(), HotelSpecifications::hasAmenity)
                 .build();
 
-        // Выполняем динамический запрос к БД и преобразовываем результат в интерфейс-проекцию
         List<HotelShort> projections = hotelRepository.findBy(spec, q -> q.as(HotelShort.class).all());
 
         return projections.stream()

@@ -9,8 +9,6 @@ import java.util.function.Function;
 
 public class HotelSpecificationBuilder implements SpecificationBuilder<Hotel> {
 
-    // Начинаем с null — Specification.where(null) запрещён в Spring Data 4.x,
-    // поэтому аккумулируем через and() и оборачиваем только в build()
     private Specification<Hotel> spec = null;
 
     @Override
@@ -37,7 +35,6 @@ public class HotelSpecificationBuilder implements SpecificationBuilder<Hotel> {
 
     @Override
     public Specification<Hotel> build() {
-        // Если ни одного условия не добавлено — возвращаем "всё" (no-op predicate)
         return (spec != null) ? spec : (root, query, cb) -> cb.conjunction();
     }
 }

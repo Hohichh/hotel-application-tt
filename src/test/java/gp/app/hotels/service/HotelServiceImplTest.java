@@ -69,7 +69,7 @@ class HotelServiceImplTest {
     private HotelServiceImpl hotelService;
 
     // ─────────────────────────────────────────────────────────────
-    // Test Fixtures — вынесенные предусловия и тестовые объекты
+    // Test Fixtures — set of pre-conditions and testing objects
     // ─────────────────────────────────────────────────────────────
 
     static final UUID HOTEL_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
@@ -224,11 +224,10 @@ class HotelServiceImplTest {
     class SearchHotels {
 
         @Test
-        @SuppressWarnings("unchecked") // Mockito + raw generic method: any() стирает тип Function<S,R> — это ожидаемо
+        @SuppressWarnings("unchecked")
         @DisplayName("should delegate to repository and return mapped results")
         void should_call_repository_with_spec_and_return_mapped_results() {
-            // Given — Specification строится внутри сервиса, мокировать логику не нужно.
-            // Проверяем поведение (что репо вызван) и маппинг.
+            // Given 
             HotelSearchParams params = new HotelSearchParams("Grand", "PalaceGroup", "London", "UK", List.of("WiFi"));
             HotelShort projection   = aHotelShortProjection();
             HotelShortResponseDto expectedDto = aShortDto();
@@ -320,7 +319,7 @@ class HotelServiceImplTest {
             // When
             hotelService.addAmenitiesToHotel(HOTEL_ID, null);
 
-            // Then — ни один репозиторий не трогается
+            // Then
             verify(amenityRepository, never()).findAllByNameIn(anyList());
             verify(hotelRepository, never()).save(any());
         }
@@ -353,7 +352,7 @@ class HotelServiceImplTest {
             // When
             hotelService.addAmenitiesToHotel(HOTEL_ID, newNames);
 
-            // Then — обе удобства созданы и добавлены отелю
+            // Then
             verify(amenityRepository).saveAll(anyList());
             verify(hotelRepository).save(hotel);
             assertThat(hotel.getAmenities()).hasSize(2);
@@ -372,7 +371,7 @@ class HotelServiceImplTest {
             // When
             hotelService.addAmenitiesToHotel(HOTEL_ID, names);
 
-            // Then — save на amenityRepository не вызван, отель обновлён
+            // Then
             verify(amenityRepository, never()).saveAll(anyList());
             verify(hotelRepository).save(hotel);
             assertThat(hotel.getAmenities()).contains(existingAmenity);
@@ -384,7 +383,7 @@ class HotelServiceImplTest {
             // Given
             Hotel hotel              = aHotel();
             Amenity existingAmenity  = anAmenity("WiFi");
-            List<String> names       = List.of("WiFi", "Parking"); // WiFi — уже есть, Parking — нет
+            List<String> names       = List.of("WiFi", "Parking"); // WiFi — exists, Parking - isn't
             when(hotelRepository.findWithAmenitiesById(HOTEL_ID)).thenReturn(Optional.of(hotel));
             when(amenityRepository.findAllByNameIn(names)).thenReturn(Set.of(existingAmenity));
             when(amenityRepository.saveAll(anyList()))
@@ -393,7 +392,7 @@ class HotelServiceImplTest {
             // When
             hotelService.addAmenitiesToHotel(HOTEL_ID, names);
 
-            // Then — только новая "Parking" сохранена
+            // Then
             verify(amenityRepository).saveAll(amenitiesCaptor.capture());
             assertThat(amenitiesCaptor.getValue()).hasSize(1);
             assertThat(amenitiesCaptor.getValue().getFirst().getName()).isEqualTo("Parking");
@@ -482,7 +481,7 @@ class HotelServiceImplTest {
         @Test
         @DisplayName("should filter out results with null groupName")
         void should_filter_out_null_group_names() {
-            // Given — один результат с null (отель без бренда), один нормальный
+            // Given 
             when(hotelRepository.countGroupedByBrand())
                     .thenReturn(List.of(
                             aHistogramResult(null, 2L),
@@ -492,7 +491,7 @@ class HotelServiceImplTest {
             // When
             Map<String, Long> result = hotelService.getHistogramByParam("brand");
 
-            // Then — null-ключ отфильтрован
+            // Then 
             assertThat(result)
                     .hasSize(1)
                     .containsEntry("StarInn", 4L)
@@ -508,7 +507,7 @@ class HotelServiceImplTest {
             when(hotelRepository.countGroupedByCountry()).thenReturn(Collections.emptyList());
             when(hotelRepository.countGroupedByAmenities()).thenReturn(Collections.emptyList());
 
-            // When / Then — ни одно из допустимых значений не кидает исключение
+            // When / Then
             for (String param : List.of("brand", "city", "country", "amenities")) {
                 assertThat(hotelService.getHistogramByParam(param)).isEmpty();
             }
